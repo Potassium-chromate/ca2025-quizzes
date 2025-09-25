@@ -10,6 +10,7 @@ main:
         la a0, argument     # 載入變數地址
         lw a0, 0(a0)        # a0 = 7
         jal ra, test        # call test, return value is save in a0
+test_exit:
         jal ra, printResult # print the result印結果
         li a7, 10           # exit
         ecall
@@ -17,7 +18,7 @@ main:
 test:
         li a0, 1            # reurn 1
         li t0, 0            # set counter 0
-        li t1, 256          # loop limit
+        li t1, 255          # loop limit
 test_forloop:
         mv a0, t0
         addi sp, sp, -16    # allocate stack space
@@ -26,12 +27,6 @@ test_forloop:
         
         jal ra, uf8_decode
         jal ra, uf8_encode
-        #li a7, 1
-        #ecall
-        
-        #la a0, newline     #print the newline
-        #li a7, 4
-        #ecall
         
         lw   t1, 0(sp)      # restore limit(t1)
         lw   t0, 8(sp)      # restore counter(t0)
@@ -49,7 +44,7 @@ test_forloop:
         la a0, newline
         li a7, 4
         ecall
-        ret
+        j test_exit
 case_pass:
     
         li a7, 1
@@ -65,8 +60,9 @@ case_pass:
         ecall
         
         addi t0, t0, 1      # i++
-        bne t0, t1, test_forloop
-        ret
+        ble t0, t1, test_forloop
+
+        j test_exit 
 #######################################################################
 printResult:
         beq x0, zero, success  # 如果 a0 == 0 跳到 fail
@@ -158,4 +154,3 @@ end_while:
         slli a0, t3, 4           # a0 = exponent << 4
         or a0, a0, t5
         ret
-
