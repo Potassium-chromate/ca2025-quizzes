@@ -33,32 +33,8 @@ test_forloop:
         addi sp, sp, 16     # deallocate stack space
         
         beq a0, t0, case_pass # if result of uf8_encode == counter, pass the test
-        li a7, 1
-        ecall
-        la a0, not_equal
-        li a7, 4
-        ecall
-        mv a0, t0
-        li a7, 1
-        ecall
-        la a0, newline
-        li a7, 4
-        ecall
         j test_exit
 case_pass:
-    
-        li a7, 1
-        ecall
-        la a0, equal
-        li a7, 4
-        ecall
-        mv a0, t0
-        li a7, 1
-        ecall
-        la a0, newline
-        li a7, 4
-        ecall
-        
         addi t0, t0, 1      # i++
         ble t0, t1, test_forloop
 
