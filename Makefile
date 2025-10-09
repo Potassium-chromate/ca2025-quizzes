@@ -11,3 +11,6 @@ clean:
 
 risc:
 	$(CC) $(CFLAGS) -S q1-uf8.c -o q1-uf8_gcc.s
+	
+clean:
+	rm q1-vector q1-uf8 q1-bfloat16 
