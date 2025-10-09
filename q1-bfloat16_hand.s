@@ -73,18 +73,5 @@ beq5:
     ret
 ###################
 bf16_to_f32:
-    srli a1, a0, 23
-    andi a1, a1, 0xFF
-    li a2, 0xFF
-    beq a1, a2, beq5
-    srli a1, a0, 16
-    andi a1, a1, 1
-    li a2, 0x7FFF
-    add a1, a1, a2
-    add, a0, a0, a1
-    ret
-beq5:
-    srli a1, a0, 16
-    li a0, 0xFFFF
-    and a0, a1, a0
+    slli a0, a0, 16
     ret
