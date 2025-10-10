@@ -1,15 +1,25 @@
 .data
-SUCCESS: .string "success"
-FAIL: .string "fail"
+PASS: .string "pass\n"
+FAIL: .string "fail\n"
 NEW_LINE: .string "\n"
 BASIC_CONVERTION: .string "Testing basic conversions...\n"
+SPECIAL_VALUE: .string "Testing special values...\n"
+SPECIAL_1: .string "Positive infinity not detected\n"
+SPECIAL_2: .string "Infinity detected as NaN\n"
+SPECIAL_3: .string "Negative infinity not detected\n"
+SPECIAL_4: .string "NaN not detected\n"
+SPECIAL_5: .string "NaN detected as infinity\n"
+SPECIAL_6: .string "Zero not detected\n"
+SPECIAL_7: .string "Negative zero not detected\n"
+
 F32: .string "f32: "
 B16: .string "b16: "
 
 .text
 main:
     li a0, 0
-    jal ra,test_basic_conversions
+    #jal ra, test_basic_conversions
+    jal ra, test_special_values
     li a7, 10
     ecall
 ###################
@@ -62,7 +72,7 @@ f32_to_bf16:
     srli a1, a0, 23
     andi a1, a1, 0xFF
     li a2, 0xFF
-    beq a1, a2, beq5
+    bne a1, a2, beq5
     srli a1, a0, 16
     andi a1, a1, 1
     li a2, 0x7FFF
@@ -144,7 +154,6 @@ bne8:
 
 ######## test_basic_conversions ########
 test_basic_conversions:
-    la a0, BASIC_CONVERTION
     addi sp, sp, -56
     li a1, 0x0
     sw a1 0(sp) #0.0f
@@ -169,7 +178,7 @@ test_basic_conversions:
     li a1, 0xd01502f9
     sw a1 40(sp) #-1e10f
     sw ra, 44(sp)
-    
+    la a0, BASIC_CONVERTION
     jal ra, printString
     #for loop
     li a1, 0
@@ -192,23 +201,57 @@ for_start1:
     srli a5, a4, 18
     srli a6, a0, 18
     beq a5, a6, bne100
+    # print F32 value
     la a0, F32
     jal ra, printString
     mv a0, a5 
     jal ra, printNumber
     la a0, NEW_LINE
     jal ra, printString
-    
+    # print B16 value
     la a0, B16
     jal ra, printString
     mv a0, a4
     jal ra, printNumber
     la a0, NEW_LINE
     jal ra, printString
-    
+    # print Fail message
+    la a0, FAIL
+    jal ra, printString
+    j fail1
 bne100:
     addi a1, a1, 4
     blt a1, a2, for_start1
+    la a0, PASS
+    jal ra, printString
+fail1:
     lw ra, 44(sp)
     addi sp, sp, 56
+    ret
+######## test_special_values ########
+test_special_values:
+    addi sp, sp, -4
+    sw ra, 0(sp)
+    la a0, SPECIAL_VALUE
+    jal ra, printString
+    
+    # Test +INF
+    li a0, 0x7F80 #+Infinity
+    jal ra, bf16_isinf
+    bne a0, x0, pass1
+    la a0, SPECIAL_1
+    jal ra, printString
+    j fail2
+pass1:
+    li a0, 0x7F80 #+Infinity
+    jal ra, bf16_isnan
+    beq a0, x0, pass2
+    la a0, SPECIAL_2
+    jal ra, printString
+    j fail2
+pass2:
+    
+fail2:
+    lw ra, 0(sp)
+    addi sp, sp, 4
     ret
