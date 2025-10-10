@@ -62,7 +62,7 @@ f32_to_bf16:
     srli a1, a0, 23
     andi a1, a1, 0xFF
     li a2, 0xFF
-    beq a1, a2, beq5
+    bne a1, a2, beq5
     srli a1, a0, 16
     andi a1, a1, 1
     li a2, 0x7FFF
